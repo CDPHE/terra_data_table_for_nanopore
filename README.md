@@ -1,4 +1,4 @@
-# seq_assembly_prep_for_terra
+# terra_data_table_for_nanopore
 
 ## Purpose:
 This python script accomplishes the following tasks:
