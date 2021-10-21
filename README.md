@@ -50,6 +50,7 @@ This only needs to be performed the first time you run the script.
 ``gsutil -m cp -r /fast_pass/* gs://bucket_name/seq_run_name/fast_pass/ ``
 
 2. Download the sample sheet and upload to your machine. The sample sheet should be an xlsx formatted file with the headers begining at line 11.
+    - NOTE! the script pulls the seq_run name from the sample sheet file name, so make sure that the seq_run name in the file name is formatted correctly! Example of correct foramt: COVMIN_0000.xlsx or COVMIN_0000rr.xlsx
 
 ### Part 2: Runing the script
 1. Activate the conda enviornment:
@@ -62,9 +63,10 @@ This only needs to be performed the first time you run the script.
   - ``--entity_col_name``: (optional) if supplied this will be the name of the entity:sampleGRID{entity_col_name}_id. if not supplied the default is to use the current date (enityt:sampleGRID20211021_id)
 
 3. Putting it altogether:
-
-``create_COVMIN_terra_data_table.py -i <sample_sheet.xlsx> -o . --bucket_path gs://covid_terra/ --entity_col_name <some_name>``
-
+  - if supplying single sample sheet
+``create_COVMIN_terra_data_table.py -i <sample_sheet.xlsx> -o . --bucket_path gs://covid_terra/ ``
+  - if supplying a directory with mulitple sample sheets:
+  ``create_COVMIN_terra_data_table.py -i <path_to_directory_with_sample_sheets> -o . --bucket_path gs://covid_terra/ --entity_col_name <some_name>``
 
 ## Outputs
 1. ``COVMIN_0000_terra_data_table.tsv`` in the specified output directory and pushed to the google bucket path specified
