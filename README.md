@@ -4,6 +4,7 @@
 This python script accomplishes the following tasks:
 - generates a terra data table compatiable for use with the cdphe nanopore-preprocessing-assemlby wdl workflow on terra
 - pushes the terra data table and original sample sheet to a google bucket
+- new! concatenates multiple datatables into a single datatable, if instead of supplying as input the path to the sample sheet, you supply the path to a directory wtih multiple sample sheets
 
 ## Requirements:
 - The python modules neccessary to run this script are contained in a conda environment; therefore so you must have Anaconda or miniconda installed.
@@ -55,19 +56,20 @@ This only needs to be performed the first time you run the script.
 ``conda activate terra_seq_prep``
 
 2. Run the script. The following inputs need to be specified:
-  - ``-i``: the path to the xlsx sample sheet
+  - ``-i``: the path to the xlsx sample sheet or the path to the directory with multiple sample sheets
   - ``-o`` : the directory where you want the terra data table to be saved on your machine. if no path is specified then the table will be saved to the current directory
-  - ``--seq_run`` : the sequencing run, which should be formatted as "COVMIN_0000" or "COVMIN_0000rr"
   - ``--bucket_path``: the path to the bucket where the fast_pass directory is located. Note: the script is NOT super flexible here. The script will only read the actual bucket name (the first part of the bucket path) and will push the outputs to the following bucket path: ``gs://bucket_name/seq_run/`` . For example if I specifiy ``--bucket_path`` as ``gs://molly_sandbox/practice/`` the output will be pushed to ``gs://molly_sandbox/COVMIN_0000`` and not ``gs://molly_sandbox/practice/COVMIN_0000``.
+  - ``--entity_col_name``: (optional) if supplied this will be the name of the entity:sampleGRID{entity_col_name}_id. if not supplied the default is to use the current date (enityt:sampleGRID20211021_id)
 
 3. Putting it altogether:
 
-``create_COVMIN_terra_data_table.py -i <sample_sheet.xlsx> -o . --seq_run COVMIN_0000 --bucket_path gs://covid_terra/``
+``create_COVMIN_terra_data_table.py -i <sample_sheet.xlsx> -o . --bucket_path gs://covid_terra/ --entity_col_name <some_name>``
 
 
 ## Outputs
-1. ``COVMIN_0000_terra_data_table.tsv`` in the specified directory and pushed to the google bucket path specified
-
-2. ``COVMIN_0000.xlsx`` pushed to the google bucket path specified
+1. ``COVMIN_0000_terra_data_table.tsv`` in the specified output directory and pushed to the google bucket path specified
+    - columns included: entity:sample_id, barcode, fasq_dir, plate_name, plate_sample_well, primer_set, out_dir, seq_run
+2. ``terra_data_table_concatenated_{entity_col_name}.tsv' `` in the specified output directory (if directory path to sample sheets is specified)
+3. ``COVMIN_0000.xlsx`` pushed to the google bucket path specified
 
 -
