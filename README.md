@@ -1,5 +1,10 @@
 # terra_data_table_for_nanopore
 
+# latest updates
+- now includes seq_run, out_dir, and primer_set in columns of terra data table
+- if input supplied is a directory with sample sheets, will concatentate all terra tables into a single data table
+- mantains old functionality of using the path to a single sample sheet as input as well 
+
 ## Purpose:
 This python script accomplishes the following tasks:
 - generates a terra data table compatiable for use with the cdphe nanopore-preprocessing-assemlby wdl workflow on terra
@@ -60,13 +65,14 @@ This only needs to be performed the first time you run the script.
   - ``-i``: the path to the xlsx sample sheet or the path to the directory with multiple sample sheets
   - ``-o`` : the directory where you want the terra data table to be saved on your machine. if no path is specified then the table will be saved to the current directory
   - ``--bucket_path``: the path to the bucket where the fast_pass directory is located. Note: the script is NOT super flexible here. The script will only read the actual bucket name (the first part of the bucket path) and will push the outputs to the following bucket path: ``gs://bucket_name/seq_run/`` . For example if I specifiy ``--bucket_path`` as ``gs://molly_sandbox/practice/`` the output will be pushed to ``gs://molly_sandbox/COVMIN_0000`` and not ``gs://molly_sandbox/practice/COVMIN_0000``.
-  - ``--entity_col_name``: (optional) if supplied this will be the name of the entity:sampleGRID{entity_col_name}_id. if not supplied the default is to use the current date (enityt:sampleGRID20211021_id)
+  - ``--entity_col_name``: (optional) if supplied this will be the name of the entity:sampleGRID{entity_col_name}_id. if not supplied the default is to use the current date (enityt:sampleGRID20211021_id); only use for when supplying directory with sample sheets
+  - ``--terra_output_dir``: (optional) if supplied changes the terra_output directory; defaut is gs://covid_terra/{seq_run}/terra_outputs/
 
 3. Putting it altogether:
   - if supplying single sample sheet
-``create_COVMIN_terra_data_table.py -i <sample_sheet.xlsx> -o . --bucket_path gs://covid_terra/ ``
+``create_COVMIN_terra_data_table.py -i <sample_sheet.xlsx> -o . --bucket_path gs://covid_terra/ --terra_output_dir gs://<whatever_you_want>``
   - if supplying a directory with mulitple sample sheets:
-  ``create_COVMIN_terra_data_table.py -i <path_to_directory_with_sample_sheets> -o . --bucket_path gs://covid_terra/ --entity_col_name <some_name>``
+  ``create_COVMIN_terra_data_table.py -i <path_to_directory_with_sample_sheets> -o . --bucket_path gs://covid_terra/ --entity_col_name <some_name> --terra_output-dir gs://<whatever_you_want>``
 
 ## Outputs
 1. ``COVMIN_0000_terra_data_table.tsv`` in the specified output directory and pushed to the google bucket path specified
