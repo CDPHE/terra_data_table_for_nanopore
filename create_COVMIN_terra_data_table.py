@@ -34,10 +34,23 @@ def create_data_table(seq_run, sample_sheet_file, bucket_name, terra_output_dir)
     seq_run_number = re.findall('COVMIN_([a-zA-Z0-9]+)', seq_run)[0]
     
     # read in sample sheet
-    sample_sheet = pd.read_excel(sample_sheet_file, header = 10, dtype = {'Alias' : object})
+    # determine header line
+    sample_sheet = pd.read_excel(sample_sheet_file)
+    for row in range(sample_sheet.shape[0]):
+        if (re.search('Sample_ID', str(sample_sheet.loc[row, 'Unnamed: 0'])) or 
+        re.search('Alias', str(sample_sheet.loc[row, 'Unnamed: 0']))):
+            header_line = row + 1
+        
+    # now read in teh excel for real
+                
+    sample_sheet = pd.read_excel(sample_sheet_file, header = header_line, dtype = {'Alias' : object, 'Sample_ID' : object})
+    if 'Sample_ID' in sample_sheet.columns:
+        sample_sheet = sample_sheet.rename(columns = {'Sample_ID' : "Alias"})
+        
     sample_sheet = sample_sheet.dropna(subset = ['Alias'])
     col_rename = {'Plate Location' : 'plate_sample_well', 'Other Name' : 'plate_name', 
-                  'Barcode' : 'barcode', 'Primer_set' : 'primer_set'}
+                  'Barcode' : 'barcode', 'Primer_set' : 'primer_set', 
+                  'Well_Location' : 'plate_sample_well', 'Other_Name' : 'plate_name' }
     sample_sheet = sample_sheet.rename(columns = col_rename)
     # add primer set column if DNE
     if 'primer_set' not in sample_sheet.columns:
