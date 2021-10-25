@@ -60,6 +60,11 @@ def create_data_table(seq_run, sample_sheet_file, bucket_name, terra_output_dir)
                                                
     for row in range(sample_sheet.shape[0]):
         sample_id = sample_sheet.Alias[row]
+        if re.search('POS', str(sample_id)):
+            sample_sheet.at[row, 'Alias'] = '%s_%s' % (sample_id, seq_run)
+        elif re.search('NC', str(sample_id)):
+            sample_sheet.at[row, 'Alias'] = '%s_%s' % (sample_id, seq_run)
+        
         barcode = sample_sheet.barcode[row]
         
         bucket_path = 'gs://%s/%s/fastq_pass/%s' % (bucket_name, seq_run, barcode)
