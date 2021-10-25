@@ -48,6 +48,7 @@ def create_data_table(seq_run, sample_sheet_file, bucket_name, terra_output_dir)
         sample_sheet = sample_sheet.rename(columns = {'Sample_ID' : "Alias"})
         
     sample_sheet = sample_sheet.dropna(subset = ['Alias'])
+    sample_sheet = sample_sheet.reset_index(drop = True)
     col_rename = {'Plate Location' : 'plate_sample_well', 'Other Name' : 'plate_name', 
                   'Barcode' : 'barcode', 'Primer_set' : 'primer_set', 
                   'Well_Location' : 'plate_sample_well', 'Other_Name' : 'plate_name' }
