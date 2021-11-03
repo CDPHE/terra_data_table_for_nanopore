@@ -27,7 +27,7 @@ def create_data_table(seq_run, sample_sheet_file, bucket_name, terra_output_dir_
                       download_date, tech_platform, read_type):
     
     print('')
-    print('  *** creating datatable for oxford nanopore run %s' % seq_run)
+    print('  ..... creating datatable for oxford nanopore run %s' % seq_run)
     
     # get just the numbers of seq_run to use in the entity column
     seq_run_number = re.findall('COVMIN_([a-zA-Z0-9]+)', seq_run)[0]
@@ -112,31 +112,39 @@ def get_seq_runs_from_file_list(sample_sheet_directory):
     files = os.listdir(sample_sheet_directory)
     print('  ..... found %d sample sheets in directory' % len(files))
     
+    # print files in directory
+    for file in files:
+        if re.search('.xlsx', file):
+            print('       %s' % file)
+    time.sleep(3)
+    
     seq_run_list = []
     for file in files:
         if re.search('.xlsx', file):
-            print('  ..... ..... %s' % file)
             seq_run = get_seq_name_from_file(xlsx_file = file)
             seq_run_list.append(seq_run)
+            
+    # print the names of the seq runs to be used...
+    print('  ..... the following will the seq_run names used, if incorrect correct name in sample sheet file name')
+    for seq_run in seq_run_list:
+        print('        %s' % seq_run)
+    time.sleep(3)
 
-    print('  ..... first, individual terra datatables will be generated for each seq run' )
-    print('  ..... next, will concatenate all datatables into a single datatable')
+#     print('  ..... first, individual terra datatables will be generated for each seq run' )
+#     print('  ..... next, will concatenate all datatables into a single datatable')
 
     return seq_run_list
 
 
 def get_seq_name_from_file(xlsx_file):
     seq_run = xlsx_file.split('.')[0]
-    if re.search('COVMIN_\d{4}', seq_run) or re.search('COVMIN_COVSEQ_\d{4}', seq_run):
-        seq_run = seq_run
-    else:
+    if not re.search('\d{4}', seq_run):
         print('')
-        print('  ..... ERROR! seq_run name is not formatted correctly in sample sheet file name.')
-        print('  ..... ERROR! format should follow: "COVMIN_0000.xlsx" or "COVMIN_0000rr.xlsx"')
-        print('  ..... exiting....')
+        print('  ..... WARNING! the seq_run name may not be formatted correctly for %s' % xlsx_file)
+        print('        ..... format should follow: "COVMIN_0000.xlsx" ')
         print('')
-        sys.exit()
-    
+        time.sleep(3)
+  
     return seq_run
 
 def concat_dfs(terra_df_list, entity_col_name):
@@ -162,7 +170,9 @@ if __name__ == '__main__':
     print('  *************************************************************************')
     print('  *** starting CREATE COVMIN TERRA DATATABLE ***')
     print('      .... last updated (major) 2021-10-28')
-    print('      .... lastest update includes additonal column headers in datatable')
+    print('      .... last updated (minor) 2021-11-03')
+    print('      .... lastest update (major) includes additonal column headers in datatable')
+    print('      .... lastest update (minor) includes warning if seq_run not formatted correctly')
     print('')
     print('')
     
@@ -220,10 +230,12 @@ if __name__ == '__main__':
     # get list of seq_runs if sample sheet directory
     if input_type == 'directory with sample sheets':
         seq_run_list = get_seq_runs_from_file_list(sample_sheet_directory= input_path)
-        
+        print('')
+        print('')
         # create data table for each seq_run
         #### create empty df list to store df of each seq_run
         df_list = []
+        print('  *** generating datatable for each indivdiual seq_run')
         for seq_run in seq_run_list:
             # get the path to the sample sheet:
             sample_sheet_file_path = os.path.join(input_path, '%s.xlsx' % seq_run)
@@ -249,6 +261,8 @@ if __name__ == '__main__':
                             bucket_path = bucket_path)
             
         
+        print('')
+        print('')
         concat_dfs(terra_df_list = df_list, 
                    entity_col_name = entity_col_name)
     
