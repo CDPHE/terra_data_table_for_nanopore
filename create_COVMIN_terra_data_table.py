@@ -79,7 +79,7 @@ def create_data_table(seq_run, sample_sheet_file, bucket_name, terra_output_dir_
         
         # create column for fastq_dir
         barcode = sample_sheet.barcode[row]
-        fastq_dir_path = os.path.join(bucket_name, seq_run, 'fastq_pass', barcorde)
+        fastq_dir_path = os.path.join(bucket_name, seq_run, 'fastq_pass', barcode)
         sample_sheet.at[row, 'fastq_dir'] = fastq_dir_path
  
     
